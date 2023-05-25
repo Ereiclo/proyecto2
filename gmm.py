@@ -10,15 +10,22 @@ def get_new_means(X,probs):
     # producto = np.tensordot(X, probs, axes=(0,0)).T
     # return producto/get_N(probs)
 
-    means = []
+
     _,k =  probs.shape
     N_i = get_N(probs)
 
-    for i in range(k):
-        means.append(np.sum(X*probs[:,i].reshape((-1,1)),axis=0)/N_i[i])
-        # print(X*(probs[:,i].reshape(-1,1)))
+    # means = []
+    # for i in range(k):
+    #     means.append(np.sum(X*probs[:,i].reshape(-1,1),axis=0)/N_i[i])
+    #     # print(X*(probs[:,i].reshape(-1,1)))
 
-    return np.array(means)
+    # return np.array(means)
+
+    X_ = np.tile(X,(k,1,1))
+    probs_ = probs.T.reshape(k,len(X),1)
+
+    return np.sum(X_*probs_,axis=1)/N_i.reshape(-1,1)
+
 
 
 def get_N(probs):
