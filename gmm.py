@@ -22,7 +22,8 @@ def get_new_means(X,probs):
     # return np.array(means)
 
     X_ = np.tile(X,(k,1,1))
-    probs_ = probs.T.reshape(k,len(X),1)
+    # probs_ = probs.T.reshape(k,len(X),1)
+    probs_ = probs.T.reshape(k,-1,1)
 
     return np.sum(X_*probs_,axis=1)/N_i.reshape(-1,1)
 
@@ -32,20 +33,26 @@ def get_N(probs):
     return np.sum(probs,axis=0)
 
 def new_cov(X,probs,means):
-    nd = []
-    n,n_cls = probs.shape 
+    n,k = probs.shape 
     N_i = get_N(probs)
 
+    # nd = []
     # print(probs.shape)
-    
 
-    for i in range(n_cls):
+    # for i in range(k):
 
-        temp = X - means[i]
+    #     temp = X - means[i]
 
-        nd.append(((temp.T) @ (temp*probs[:,i].reshape((-1,1))))/N_i[i])
+    #     nd.append(((temp.T) @ (temp*probs[:,i].reshape(-1,1)))/N_i[i])
 
-    return nd
+    # return nd
+    X_ = np.tile(X,(k,1,1))
+    means_ = means.reshape(k,1,-1)
+    temp = X_ - means_
+    probs_ = probs.T.reshape(k,-1,1)
+
+    return (np.transpose(temp,axes=(0,2,1)) @ (temp*probs_)) / N_i.reshape(k,-1,1)
+
 
 def get_pi(probs):
     n,_ = probs.shape
