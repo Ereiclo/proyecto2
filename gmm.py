@@ -7,8 +7,7 @@ from tqdm import tqdm
 from scipy.stats import multivariate_normal
 
 def get_new_means(X,probs):
-    # producto = np.tensordot(X, probs, axes=(0,0)).T
-    # return producto/get_N(probs)
+    
 
 
     _,k =  probs.shape
@@ -37,7 +36,7 @@ def new_cov(X,probs,means):
     N_i = get_N(probs)
 
     # nd = []
-    # print(probs.shape)
+    # # print(probs.shape)
 
     # for i in range(k):
 
@@ -62,29 +61,38 @@ def get_pi(probs):
         
 def get_probs(X,means,cov,pi):
     c = len(pi) 
-    probs = []
+    # probs = []
     
-    for k_i in range(c):
-        temp1 = np.array(multivariate_normal.pdf(X, mean=means[k_i], cov=cov[k_i]))
-        numerador = pi[k_i]*temp1
-        denominador = np.zeros(len(X)) 
+    # for k_i in range(c):
+    #     temp1 = np.array(multivariate_normal.pdf(X, mean=means[k_i], cov=cov[k_i]))
+    #     numerador = pi[k_i]*temp1
+    #     denominador = np.zeros(len(X)) 
 
 
-        for j in range(c):
-            temp = np.array(multivariate_normal.pdf(X, mean=means[j], cov=cov[j]))
-            denominador = denominador + pi[j]*temp
+    #     for j in range(c):
+    #         temp = np.array(multivariate_normal.pdf(X, mean=means[j], cov=cov[j]))
+    #         denominador = denominador + pi[j]*temp
         
                
-        probs.append(numerador/denominador)
+    #     probs.append(numerador/denominador)
     
-    # print(probs[0][0])
-    # print(probs[1][0])
-    # print(probs[2][0])
-    # # print(np.array(probs).reshape((-1,c))[0,:])
-    # print(np.array(probs).T[0,:])
+    # # print(probs[0][0])
+    # # print(probs[1][0])
+    # # print(probs[2][0])
+    # # # print(np.array(probs).reshape((-1,c))[0,:])
+    # # print(np.array(probs).T[0,:])
+    # return np.array(probs).T
+
+    probs = [pi[j]*np.array(multivariate_normal.pdf(X,mean=means[j],cov=cov[j])) for j in range(c)]
+    probs = np.array(probs)
 
 
-    return np.array(probs).T
+    return (probs / np.sum(probs,axis=0)).T
+
+
+
+
+    
             
 
 
@@ -162,8 +170,8 @@ clases = gmm(X,means,cov,pi,1000)
 # print(pi)
 print(clases)
 print(y)
-plt.scatter(X.T[0], X.T[1], c=clases)
-plt.show()
+# plt.scatter(X.T[0], X.T[1], c=clases)
+# plt.show()
     
 
 
