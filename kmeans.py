@@ -145,4 +145,4 @@ def Show_Imagen():
   plt.show()
 
 
-Show_Imagen()
+# Show_Imagen()

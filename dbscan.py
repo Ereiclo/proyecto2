@@ -13,6 +13,8 @@ def isNoise(label):
 X, y = load_iris(return_X_y=True)
 
 X = np.unique(X.T[2:3+1].T, axis=0)
+
+
 tree = KDTree(X)
 min_vecinos = 3 
 r = 0.5

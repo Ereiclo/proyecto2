@@ -83,7 +83,10 @@ def get_probs(X,means,cov,pi):
     # # print(np.array(probs).T[0,:])
     # return np.array(probs).T
 
-    probs = [pi[j]*np.array(multivariate_normal.pdf(X,mean=means[j],cov=cov[j])) for j in range(c)]
+    # for j in range(c):
+    #     print(cov[j])
+
+    probs = [pi[j]*np.array(multivariate_normal.pdf(X,mean=means[j],cov=cov[j],allow_singular=True)) for j in range(c)]
     probs = np.array(probs)
 
 
@@ -111,68 +114,66 @@ def gmm(X,means,cov,pi,epochs):
         pi = get_pi(probs)
         probs = get_probs(X,means,cov,pi)        
 
-    
-
 
     return np.argmax(probs, axis=1)
     
 
-X, y = load_iris(return_X_y=True)
-# print(y)
-X = X[:,2:]
-kmeans = KMeans(n_clusters=3, random_state=0, n_init="auto").fit(X)
+if __name__ == '__main__':
+    X, y = load_iris(return_X_y=True)
+    # print(y)
+    X = X[:,2:]
+    kmeans = KMeans(n_clusters=3, random_state=0, n_init="auto").fit(X)
 
-total_labels = kmeans.labels_
+    total_labels = kmeans.labels_
 
-labels = {lb for lb in kmeans.labels_}
-# print(kmeans.cluster_centers_)
-# print(labels)
+    labels = {lb for lb in kmeans.labels_}
+    # print(kmeans.cluster_centers_)
+    # print(labels)
 
+    means = kmeans.cluster_centers_
+    # cov = [np.eye(len(X),len(X)) for _ in range(len(labels))]
+    cov = []
+    pi = []
 
-means = kmeans.cluster_centers_
-# cov = [np.eye(len(X),len(X)) for _ in range(len(labels))]
-cov = []
-pi = []
+    for lb in labels:
+        indexes = total_labels == lb
+        actual_X = X[indexes]
 
-for lb in labels:
-    indexes = total_labels == lb
-    actual_X = X[indexes]
+        pi.append(len(actual_X)/len(X))
 
-    pi.append(len(actual_X)/len(X))
+        cov_ = np.cov(actual_X.T)
+        cov.append(cov_)
 
-    cov_ = np.cov(actual_X.T)
-    cov.append(cov_)
-
-    # for i in range(len(cov)):
-        # cov_[i][i] = 1
-
-
-    # print(cov_.shape)
+        # for i in range(len(cov)):
+            # cov_[i][i] = 1
 
 
-# cov = np.concatenate(cov)
-# pi = np.array(pi)
-# print(X.shape)
-
-# probs = get_probs(X,means,cov,pi)
+        # print(cov_.shape)
 
 
-# get_new_means(X,probs)
-# print(get_probs(X,means,cov,pi).shape)
-# for gamma_i in get_probs(X,means,cov,pi):
-    # print(gamma_i.shape)
-# print(cov)
+    # cov = np.concatenate(cov)
+    # pi = np.array(pi)
+    # print(X.shape)
 
-# print(kmeans.cluster_centers_)
+    # probs = get_probs(X,means,cov,pi)
 
-clases = gmm(X,means,cov,pi,1000)
 
-# print(pi)
-print(clases)
-print(y)
-# plt.scatter(X.T[0], X.T[1], c=clases)
-# plt.show()
-    
+    # get_new_means(X,probs)
+    # print(get_probs(X,means,cov,pi).shape)
+    # for gamma_i in get_probs(X,means,cov,pi):
+        # print(gamma_i.shape)
+    # print(cov)
+
+    # print(kmeans.cluster_centers_)
+
+    clases = gmm(X,means,cov,pi,1000)
+
+    # print(pi)
+    print(clases)
+    print(y)
+    plt.scatter(X.T[0], X.T[1], c=clases)
+    plt.show()
+        
 
 
 
