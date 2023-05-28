@@ -62,12 +62,7 @@ class Experimentos():
     def GMM():
         k = range(2, 10+1)
         epoca = [100, 500, 1000]
-        contador_por_error = 0
         for archivo in dicc_pca:
-            if contador_por_error < 6:
-                contador_por_error+=1
-                continue
-            print(archivo)
             resultados = {
                 "k": [],
                 'epoca': [],
