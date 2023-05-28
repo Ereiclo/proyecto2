@@ -12,7 +12,6 @@ import gmm
 from tqdm import tqdm
 import json
 import os
-from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 import pandas as pd
 from tqdm import tqdm
@@ -60,9 +59,65 @@ class Experimentos():
 
             pd.DataFrame(resultados).to_csv(f'resultados_experimentos/k_medias/{archivo}.csv',index=False)
 
+    def GMM():
+        k = range(2, 10+1)
+        epoca = [100, 500, 1000]
+        contador_por_error = 0
+        for archivo in dicc_pca:
+            if contador_por_error < 6:
+                contador_por_error+=1
+                continue
+            print(archivo)
+            resultados = {
+                "k": [],
+                'epoca': [],
+                'silhouette_score': [],
+                'davies_bouldin_score': [],
+                'calinski_harabasz_score': []
+            }
+            X = dicc_pca[archivo]
+            for k_i in tqdm(k):
+                for epoca_i in epoca:
+                    clases = gmm.gmm(X=X, epochs=epoca_i, k=k_i, DEBUG=False)
+                    resultados['k'].append(k_i)
+                    resultados['epoca'].append(epoca_i)
+                    resultados['silhouette_score'].append(silhouette_score(X,clases))
+                    resultados['davies_bouldin_score'].append(davies_bouldin_score(X,clases))
+                    resultados['calinski_harabasz_score'].append(calinski_harabasz_score(X,clases))
+
+            pd.DataFrame(resultados).to_csv(f'resultados_experimentos/gmm/{archivo}.csv',index=False)
+            
 
 
-Experimentos.K_Medias()
+
+    def DBSCAN():
+        umbral = [0.5, 0.1, 0.05, 0.01]
+        resultados = {
+            'archivo': [],
+            'n_clases': [],
+            'umbral': [],
+            'silhouette_score': [],
+            'davies_bouldin_score': [],
+            'calinski_harabasz_score': []
+        }
+        for archivo in dicc_pca:
+            X = dicc_pca[archivo]
+            print(X.shape)
+            for umbral_i in umbral:
+                clases = dbscan.db_scan(X, umbral_i)
+                print(np.unique(clases).size)
+                resultados['archivo'].append(archivo)
+                resultados['n_clases'].append(np.unique(clases).size)
+                resultados['umbral'].append(umbral_i)
+                resultados['silhouette_score'].append(silhouette_score(X,clases))
+                resultados['davies_bouldin_score'].append(davies_bouldin_score(X,clases))
+                resultados['calinski_harabasz_score'].append(calinski_harabasz_score(X,clases))
+
+        pd.DataFrame(resultados).to_csv(f'resultados_experimentos/dbscan/resultados.csv',index=False)
+
+
+
+Experimentos.GMM()
 
 """ 
 X = dicc_pca['caracteristicos2_pca0.99']
