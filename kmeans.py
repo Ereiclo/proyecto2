@@ -8,9 +8,12 @@ import numpy as np
 # Devuelve la distancia entre 2 vectores.
 # Pruebe con varias funciones de distancia.
 def distance(v1: np.ndarray, v2: np.ndarray, orden: int):
-  # dif = np.abs(v1-v2)**orden
-  # return np.sum(dif)**(1/orden)
+
   dim_v1 = len(v1.shape)
+  #distancia chebyshev
+  if orden == -1:
+    return np.max(np.abs(v1-v2),axis=dim_v1-1)
+
   return np.sum(np.abs(v1-v2)**orden,axis=dim_v1-1)**(1/orden)
 
 # Inicialice los k centroides tomando aleatoriamente k elementos de los datos para que cada
