@@ -2,13 +2,16 @@ from sklearn.datasets import load_iris
 from sklearn.neighbors import KDTree
 import matplotlib.pyplot as plt
 import numpy as np
-from tqdm import tqdm
 
 def hasLabel(label):
     return label >= 0
 
 def isNoise(label):
     return label == 0
+
+
+
+# def db_scan():
 
 X, y = load_iris(return_X_y=True)
 
