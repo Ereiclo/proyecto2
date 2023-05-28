@@ -86,33 +86,33 @@ class Experimentos():
 
 
     def DBSCAN():
-        umbral = [0.5, 0.1, 0.05, 0.01]
-        resultados = {
-            'archivo': [],
-            'n_clases': [],
-            'umbral': [],
-            'silhouette_score': [],
-            'davies_bouldin_score': [],
-            'calinski_harabasz_score': []
-        }
+        radio = range(500, 1000+1, 100)
+        min_vecinos = range(3, 7) 
         for archivo in dicc_pca:
+            # print(archivo)
+            resultados = {
+                'n_clases': [],
+                'radio': [],
+                'min_vecinos': [],
+                'silhouette_score': [],
+                'davies_bouldin_score': [],
+                'calinski_harabasz_score': []
+            }
             X = dicc_pca[archivo]
-            print(X.shape)
-            for umbral_i in umbral:
-                clases = dbscan.db_scan(X, umbral_i)
-                print(np.unique(clases).size)
-                resultados['archivo'].append(archivo)
-                resultados['n_clases'].append(np.unique(clases).size)
-                resultados['umbral'].append(umbral_i)
-                resultados['silhouette_score'].append(silhouette_score(X,clases))
-                resultados['davies_bouldin_score'].append(davies_bouldin_score(X,clases))
-                resultados['calinski_harabasz_score'].append(calinski_harabasz_score(X,clases))
+            for min_vecinos_i in min_vecinos:
+                for radio_i in tqdm(radio):
+                    clases = dbscan.db_scan(X, radio_i, min_vecinos_i)
+                    resultados['n_clases'].append(np.unique(clases).size)
+                    resultados['radio'].append(radio_i)
+                    resultados['min_vecinos'].append(min_vecinos_i)
+                    resultados['silhouette_score'].append(silhouette_score(X,clases))
+                    resultados['davies_bouldin_score'].append(davies_bouldin_score(X,clases))
+                    resultados['calinski_harabasz_score'].append(calinski_harabasz_score(X,clases))
 
-        pd.DataFrame(resultados).to_csv(f'resultados_experimentos/dbscan/resultados.csv',index=False)
-
+            pd.DataFrame(resultados).to_csv(f'resultados_experimentos/dbscan/{archivo}.csv',index=False)
 
 
-Experimentos.GMM()
+Experimentos.DBSCAN()
 
 """ 
 X = dicc_pca['caracteristicos2_pca0.99']
