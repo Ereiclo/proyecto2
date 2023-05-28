@@ -11,84 +11,89 @@ def isNoise(label):
 
 
 
-# def db_scan():
+def db_scan(X,r=0.5):
+    tree = KDTree(X)
+    min_vecinos = 3 
+    eps = .0000000001
 
-X, y = load_iris(return_X_y=True)
+    labels = np.full(shape=X.shape[0], fill_value=-1)
 
-X = np.unique(X.T[2:3+1].T, axis=0)
+    actual_label = 1
 
+    for p_i in range(len(X)):
+        if hasLabel(labels[p_i]):
+            continue
 
-tree = KDTree(X)
-min_vecinos = 3 
-r = 0.5
-eps = .0000000001
+        [indexes],[_] = tree.query_radius([X[p_i]],r=r + eps,return_distance=True,sort_results=True)
 
+        if len(indexes) < min_vecinos:
+            labels[p_i] = 0 
+            continue
 
-labels = np.full(shape=X.shape[0], fill_value=-1)
+        labels[p_i] = actual_label
 
-actual_label = 1
+        indexes = indexes[1:]
 
-for p_i in range(len(X)):
-    if hasLabel(labels[p_i]):
-        continue
+        i = 0
+        while i < len(indexes):
+            p_v = indexes[i]
 
-    [indexes],[_] = tree.query_radius([X[p_i]],r=r + eps,return_distance=True,sort_results=True)
+            if isNoise(labels[p_v]):
+                labels[p_v] = actual_label 
 
-    if len(indexes) < min_vecinos:
-        labels[p_i] = 0 
-        continue
+            if hasLabel(labels[p_v]) :
+                # print('pipipi',labels[p_v],p_v)
+                i += 1
+                continue
 
-    labels[p_i] = actual_label
-
-    indexes = indexes[1:]
-
-    i = 0
-    while i < len(indexes):
-        p_v = indexes[i]
-
-        if isNoise(labels[p_v]):
             labels[p_v] = actual_label 
 
-        if hasLabel(labels[p_v]) :
-            # print('pipipi',labels[p_v],p_v)
-            i += 1
-            continue
+            [new_indexes],[_] = tree.query_radius([X[p_v]],r=r+ eps,return_distance=True,sort_results=True)
+            # [new_indexes2],[_] = tree.query_radius([X[p_v]],r=r+.0000000001,return_distance=True,sort_results=True)
 
-        labels[p_v] = actual_label 
+            # print(X[p_v])
+            # print(X[new_indexes])
+            # print(new_indexes)
+            # print(_)
 
-        [new_indexes],[_] = tree.query_radius([X[p_v]],r=r+ eps,return_distance=True,sort_results=True)
-        # [new_indexes2],[_] = tree.query_radius([X[p_v]],r=r+.0000000001,return_distance=True,sort_results=True)
-
-        # print(X[p_v])
-        # print(X[new_indexes])
-        # print(new_indexes)
-        # print(_)
-
-        if len(new_indexes) < min_vecinos:
-            i += 1
-            continue
+            if len(new_indexes) < min_vecinos:
+                i += 1
+                continue
 
 
-        # print(p_v)
-       
-        # print(_)
-
+            # print(p_v)
         
-        # print(p_v)
-        # print(new_indexes)
-        # print(_)
-        indexes = np.concatenate([indexes, new_indexes[1:]])
-        # print(indexes)
-        i += 1
+            # print(_)
 
+            
+            # print(p_v)
+            # print(new_indexes)
+            # print(_)
+            indexes = np.concatenate([indexes, new_indexes[1:]])
+            # print(indexes)
+            i += 1
+
+        # print({l for l in labels})
+        # plt.scatter(X.T[0], X.T[1], c=labels+1)
+        # plt.show()
+
+        actual_label += 1
+    
+    return labels
+
+
+
+
+if __name__ == "__main__":
+    X, y = load_iris(return_X_y=True)
+    X = np.unique(X.T[2:3+1].T, axis=0)
+    labels = db_scan(X)
     # print({l for l in labels})
-    # plt.scatter(X.T[0], X.T[1], c=labels+1)
-    # plt.show()
-
-    actual_label += 1
+    plt.scatter(X.T[0], X.T[1], c=labels+1)
+    plt.show()
 
 
-# print({l for l in labels})
-plt.scatter(X.T[0], X.T[1], c=labels+1)
-plt.show()
+
+
+
 

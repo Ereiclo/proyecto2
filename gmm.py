@@ -13,15 +13,7 @@ def get_new_means(X,probs):
     _,k =  probs.shape
     N_i = get_N(probs)
 
-    # means = []
-    # for i in range(k):
-    #     means.append(np.sum(X*probs[:,i].reshape(-1,1),axis=0)/N_i[i])
-    #     # print(X*(probs[:,i].reshape(-1,1)))
-
-    # return np.array(means)
-
     X_ = np.tile(X,(k,1,1))
-    # probs_ = probs.T.reshape(k,len(X),1)
     probs_ = probs.T.reshape(k,-1,1)
 
     return np.sum(X_*probs_,axis=1)/N_i.reshape(-1,1)
@@ -35,16 +27,6 @@ def new_cov(X,probs,means):
     n,k = probs.shape 
     N_i = get_N(probs)
 
-    # nd = []
-    # # print(probs.shape)
-
-    # for i in range(k):
-
-    #     temp = X - means[i]
-
-    #     nd.append(((temp.T) @ (temp*probs[:,i].reshape(-1,1)))/N_i[i])
-
-    # return nd
     X_ = np.tile(X,(k,1,1))
     means_ = means.reshape(k,1,-1)
     temp = X_ - means_
@@ -61,30 +43,7 @@ def get_pi(probs):
         
 def get_probs(X,means,cov,pi):
     c = len(pi) 
-    # probs = []
     
-    # for k_i in range(c):
-    #     temp1 = np.array(multivariate_normal.pdf(X, mean=means[k_i], cov=cov[k_i]))
-    #     numerador = pi[k_i]*temp1
-    #     denominador = np.zeros(len(X)) 
-
-
-    #     for j in range(c):
-    #         temp = np.array(multivariate_normal.pdf(X, mean=means[j], cov=cov[j]))
-    #         denominador = denominador + pi[j]*temp
-        
-               
-    #     probs.append(numerador/denominador)
-    
-    # # print(probs[0][0])
-    # # print(probs[1][0])
-    # # print(probs[2][0])
-    # # # print(np.array(probs).reshape((-1,c))[0,:])
-    # # print(np.array(probs).T[0,:])
-    # return np.array(probs).T
-
-    # for j in range(c):
-    #     print(cov[j])
 
     probs = [pi[j]*np.array(multivariate_normal.pdf(X,mean=means[j],cov=cov[j],allow_singular=True)) for j in range(c)]
     probs = np.array(probs)
@@ -94,16 +53,38 @@ def get_probs(X,means,cov,pi):
 
 
 
+def get_init_data(X,k=3):
 
     
-            
+    kmeans = KMeans(n_clusters=k, random_state=0, n_init="auto").fit(X)
+
+    total_labels = kmeans.labels_
+
+    labels = {lb for lb in kmeans.labels_}
+    means = kmeans.cluster_centers_
+    cov = []
+    pi = []
+
+    for lb in labels:
+        indexes = total_labels == lb
+        actual_X = X[indexes]
+
+        pi.append(len(actual_X)/len(X))
+
+        cov_ = np.cov(actual_X.T)
+        cov.append(cov_)
 
 
-def gmm(X,means,cov,pi,epochs):
+
+    return pi,means,cov
+
+
+def gmm(X,epochs,k=3):
+
+
+    pi,means,cov = get_init_data(X,k) 
+    
     probs = get_probs(X,means,cov,pi)
-
-    # for i in range(10):
-        # print(probs[i])
 
     for i in range(epochs):
         if i % 100 == 0:
@@ -122,27 +103,7 @@ if __name__ == '__main__':
     X, y = load_iris(return_X_y=True)
     # print(y)
     X = X[:,2:]
-    kmeans = KMeans(n_clusters=3, random_state=0, n_init="auto").fit(X)
-
-    total_labels = kmeans.labels_
-
-    labels = {lb for lb in kmeans.labels_}
-    # print(kmeans.cluster_centers_)
-    # print(labels)
-
-    means = kmeans.cluster_centers_
-    # cov = [np.eye(len(X),len(X)) for _ in range(len(labels))]
-    cov = []
-    pi = []
-
-    for lb in labels:
-        indexes = total_labels == lb
-        actual_X = X[indexes]
-
-        pi.append(len(actual_X)/len(X))
-
-        cov_ = np.cov(actual_X.T)
-        cov.append(cov_)
+    
 
         # for i in range(len(cov)):
             # cov_[i][i] = 1
@@ -166,7 +127,7 @@ if __name__ == '__main__':
 
     # print(kmeans.cluster_centers_)
 
-    clases = gmm(X,means,cov,pi,1000)
+    clases = gmm(X,200,k=3)
 
     # print(pi)
     print(clases)

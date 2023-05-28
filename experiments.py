@@ -1,4 +1,8 @@
 from  skimage.io import imread, imshow
+import kmeans
+from sklearn.metrics import davies_bouldin_score,silhouette_score
+from sim_matrix import generate_matrix_score
+import dbscan
 import pywt
 import pywt.data
 import matplotlib.pyplot as plt
@@ -12,65 +16,29 @@ from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 
 
-ruta_drive = './matrices_imagenes/'
-rutas_pca = glob.glob(ruta_drive + "*.npy")
-diccionario_pca = {}
-for ruta in rutas_pca:
-  if len(ruta.split('_')) > 1:
-    diccionario_pca[os.path.splitext(os.path.basename(ruta))[0]] = np.load(ruta)
 
-# print(diccionario_pca.keys())
-
-
-X = diccionario_pca['caracteristicos2_pca0.99']
-
-kmeans = KMeans(n_clusters=8, random_state=0, n_init="auto").fit(X)
-
-total_labels = kmeans.labels_
-
-labels = {lb for lb in kmeans.labels_}
-# print(kmeans.cluster_centers_)
-# print(labels)
+def load_data():
+    ruta_drive = './matrices_imagenes/'
+    rutas_pca = glob.glob(ruta_drive + "*.npy")
+    diccionario_pca = {}
+    for ruta in rutas_pca:
+        if len(ruta.split('_')) > 1:
+            diccionario_pca[os.path.splitext(os.path.basename(ruta))[0]] = np.load(ruta)
+    
+    return diccionario_pca
 
 
-means = kmeans.cluster_centers_
-# cov = [np.eye(len(X),len(X)) for _ in range(len(labels))]
-cov = []
-pi = []
+dicc_pca = load_data()
+X = dicc_pca['caracteristicos2_pca0.99']
 
-for lb in labels:
-    indexes = total_labels == lb
-    actual_X = X[indexes]
-
-    pi.append(len(actual_X)/len(X))
-
-    cov_ = np.cov(actual_X.T)
-    cov.append(cov_)
-
-    # for i in range(len(cov)):
-        # cov_[i][i] = 1
+# clases = dbscan.db_scan(X,500)
+# _,clases = kmeans.kmeans(X,8,0.5,2)
+clases = gmm.gmm(X,100,k=8)
+matrix_score = generate_matrix_score(X,clases)
 
 
-    # print(cov_.shape)
+print(silhouette_score(X,clases))
+print(davies_bouldin_score(X,clases))
+plt.imshow(matrix_score,cmap='seismic')
+plt.show()
 
-
-# cov = np.concatenate(cov)
-# pi = np.array(pi)
-# print(X.shape)
-
-# probs = get_probs(X,means,cov,pi)
-
-
-# get_new_means(X,probs)
-# print(get_probs(X,means,cov,pi).shape)
-# for gamma_i in get_probs(X,means,cov,pi):
-    # print(gamma_i.shape)
-# print(cov)
-
-# print(kmeans.cluster_centers_)
-
-print(X.shape)
-print(np.array(means).shape)
-print(np.array(cov).shape)
-print(np.array(pi).shape)
-clases = gmm.gmm(X,means,cov,pi,1000)
