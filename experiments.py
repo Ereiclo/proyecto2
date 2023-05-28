@@ -1,6 +1,6 @@
 from  skimage.io import imread, imshow
 import kmeans
-from sklearn.metrics import davies_bouldin_score,silhouette_score
+from sklearn.metrics import davies_bouldin_score,silhouette_score,calinski_harabasz_score
 from sim_matrix import generate_matrix_score
 import dbscan
 import pywt
@@ -32,13 +32,14 @@ dicc_pca = load_data()
 X = dicc_pca['caracteristicos2_pca0.99']
 
 # clases = dbscan.db_scan(X,500)
-# _,clases = kmeans.kmeans(X,8,0.5,2)
-clases = gmm.gmm(X,100,k=8)
+_,clases = kmeans.kmeans(X,8,0.5,2)
+# clases = gmm.gmm(X,100,k=8)
 matrix_score = generate_matrix_score(X,clases)
 
 
 print(silhouette_score(X,clases))
 print(davies_bouldin_score(X,clases))
-plt.imshow(matrix_score,cmap='seismic')
-plt.show()
+print(calinski_harabasz_score(X,clases))
+# plt.imshow(matrix_score,cmap='seismic')
+# plt.show()
 
