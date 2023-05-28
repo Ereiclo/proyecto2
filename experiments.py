@@ -22,13 +22,17 @@ def load_data():
     rutas_pca = glob.glob(ruta_drive + "*.npy")
     diccionario_pca = {}
     for ruta in rutas_pca:
-        if len(ruta.split('_')) > 1:
-            diccionario_pca[os.path.splitext(os.path.basename(ruta))[0]] = np.load(ruta)
+        nombre_archivo = os.path.basename(ruta)
+        if len(nombre_archivo.split('_')) != 1:
+            diccionario_pca[os.path.splitext(nombre_archivo)[0]] = np.load(ruta)
     
     return diccionario_pca
 
 
 dicc_pca = load_data()
+
+
+""" 
 X = dicc_pca['caracteristicos2_pca0.99']
 
 # clases = dbscan.db_scan(X,500)
@@ -41,5 +45,5 @@ print(silhouette_score(X,clases))
 print(davies_bouldin_score(X,clases))
 print(calinski_harabasz_score(X,clases))
 # plt.imshow(matrix_score,cmap='seismic')
-# plt.show()
+# plt.show() """
 
