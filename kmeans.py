@@ -82,28 +82,32 @@ def distancia_promedio_centroides(old_centroide: np.ndarray, new_centroide: np.n
 # generados para poder utilizarlos en análisis posteriores.
 
 
-def kmeans(data: np.ndarray, k: int, umbral, orden):
+def kmeans(data: np.ndarray, k: int, umbral, orden, DEBUG=True):
   centroides = Init_Centroide(data, k)
   # print(centroides)
-  print("CENTROIDE LISTO")
+  if DEBUG:
+    print("CENTROIDE LISTO")
   clusters = get_cluster(data, centroides, orden)
 
-  print(Counter(clusters))
-  print(Counter(clusters).total())
-  print(len(data))
-  print("CLUSTERS LISTOS")
+  if DEBUG:
+    print(Counter(clusters))
+    print(Counter(clusters).total())
+    print(len(data))
+    print("CLUSTERS LISTOS")
   new_centroides = return_new_centroide(clusters, data, k)
-  print("NUEVOS CENTROIDES")
+  if DEBUG:
+    print("NUEVOS CENTROIDES")
   _iter = 0
   # print(new_centroides)
   while (distancia_promedio_centroides(centroides, new_centroides, orden) > umbral):
 
-     _iter += 1
-     centroides = new_centroides
-     clusters = get_cluster(data, centroides, orden)
-     new_centroides = return_new_centroide(clusters, data, k)
+    _iter += 1
+    centroides = new_centroides
+    clusters = get_cluster(data, centroides, orden)
+    new_centroides = return_new_centroide(clusters, data, k)
 
-     print(_iter, distancia_promedio_centroides(centroides, new_centroides, orden))
+    if DEBUG:
+      print(_iter, distancia_promedio_centroides(centroides, new_centroides, orden))
 
   return new_centroides, clusters
 

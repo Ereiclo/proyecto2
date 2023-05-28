@@ -14,7 +14,8 @@ import json
 import os
 from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
-
+import pandas as pd
+from tqdm import tqdm
 
 
 def load_data():
@@ -31,6 +32,37 @@ def load_data():
 
 dicc_pca = load_data()
 
+class Experimentos():
+    def K_Medias():
+        k = range(2, 10 + 1)
+        umbral = [0.5, 0.1, 0.05, 0.01]
+        orden = [1, 2, -1]
+        for archivo in dicc_pca:
+            resultados = {
+                "k": [],
+                'umbral': [],
+                'orden': [],
+                'silhouette_score': [],
+                'davies_bouldin_score': [],
+                'calinski_harabasz_score': []
+            }
+            X = dicc_pca[archivo]
+            for k_i in tqdm(k):
+                for umbral_i in umbral:
+                    for orden_i in orden:
+                        _, clases = kmeans.kmeans(data=X, k=k_i, umbral=umbral_i, orden=orden_i, DEBUG=False)
+                        resultados['k'].append(k_i)
+                        resultados['umbral'].append(umbral_i)
+                        resultados['orden'].append(orden_i)
+                        resultados['silhouette_score'].append(silhouette_score(X,clases))
+                        resultados['davies_bouldin_score'].append(davies_bouldin_score(X,clases))
+                        resultados['calinski_harabasz_score'].append(calinski_harabasz_score(X,clases))
+
+            pd.DataFrame(resultados).to_csv(f'resultados_experimentos/k_medias/{archivo}.csv',index=False)
+
+
+
+Experimentos.K_Medias()
 
 """ 
 X = dicc_pca['caracteristicos2_pca0.99']
