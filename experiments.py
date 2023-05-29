@@ -63,6 +63,7 @@ class Experimentos():
         k = range(2, 10+1)
         epoca = [100, 500, 1000]
         for archivo in dicc_pca:
+            print(archivo)
             resultados = {
                 "k": [],
                 'epoca': [],

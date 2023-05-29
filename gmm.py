@@ -54,18 +54,20 @@ def get_probs(X,means,cov,pi):
 
 
 
-def get_init_data(X,k=3,option=1):
+def get_init_data(X,k=3,option=1, DEBUG = True):
 
     kmeans,total_labels,means = None,None,None
 
 
     if option:
-        print('Using kmeans from sklearn')
+        if DEBUG:
+            print('Using kmeans from sklearn')
         kmeans = KMeans(n_clusters=k, random_state=0, n_init="auto").fit(X)
         total_labels = kmeans.labels_
         means = kmeans.cluster_centers_
     else:
-        print('Using random most distant points')
+        if DEBUG:
+            print('Using random most distant points')
         centroides = Init_Centroide(X,k)
         total_labels = get_cluster(X,centroides,-1)
         means = return_new_centroide(total_labels,X,k)
@@ -92,7 +94,7 @@ def get_init_data(X,k=3,option=1):
 def gmm(X,epochs,k=3, DEBUG=True,option=1):
 
 
-    pi,means,cov = get_init_data(X,k,option) 
+    pi,means,cov = get_init_data(X,k,option, DEBUG) 
     
     probs = get_probs(X,means,cov,pi)
 
