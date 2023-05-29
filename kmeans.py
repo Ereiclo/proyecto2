@@ -21,9 +21,24 @@ def distance(v1: np.ndarray, v2: np.ndarray, orden: int):
 
 
 def Init_Centroide(data: np.ndarray, k: int):
-  indices_aleatorios = np.random.choice(len(data), k, replace=False)
+  # indices_aleatorios = np.random.choice(len(data), k, replace=False)
 
-  return data[indices_aleatorios]
+  # return data[indices_aleatorios]
+
+  #find k points more distant
+  random_point = np.random.choice(len(data),1,replace=False)
+
+  total_points = [data[random_point].reshape(-1)]
+
+  for i in range(1,k):
+    points_ = np.tile(data,(i,1,1))
+
+    if i > 1:
+      total_points.append(data[np.argmax(np.sum(distance(points_,np.array(total_points).reshape(i,1,-1),orden=2),axis=0)/i)])
+    else: 
+      total_points.append(data[np.argmax(distance(points_,data[random_point],orden=2))])
+
+  return np.array(total_points) 
 
 # Dado que los grupos se han formado previamente, se pueden obtener nuevos
 # centroides calculando el vector promedio de cada grupo.
