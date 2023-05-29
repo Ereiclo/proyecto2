@@ -112,7 +112,7 @@ class Experimentos():
             pd.DataFrame(resultados).to_csv(f'resultados_experimentos/dbscan/{archivo}.csv',index=False)
 
 
-Experimentos.DBSCAN()
+Experimentos.GMM()
 
 """ 
 X = dicc_pca['caracteristicos2_pca0.99']
