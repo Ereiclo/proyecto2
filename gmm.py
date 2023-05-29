@@ -1,4 +1,5 @@
 from sklearn.datasets import load_iris
+from kmeans import Init_Centroide,get_cluster,return_new_centroide
 from sklearn.cluster import KMeans
 from sklearn.neighbors import KDTree
 import matplotlib.pyplot as plt
@@ -53,15 +54,24 @@ def get_probs(X,means,cov,pi):
 
 
 
-def get_init_data(X,k=3):
+def get_init_data(X,k=3,option=1):
 
-    
-    kmeans = KMeans(n_clusters=k, random_state=0, n_init="auto").fit(X)
+    kmeans,total_labels,means = None,None,None
 
-    total_labels = kmeans.labels_
 
-    labels = {lb for lb in kmeans.labels_}
-    means = kmeans.cluster_centers_
+    if option:
+        print('Using kmeans from sklearn')
+        kmeans = KMeans(n_clusters=k, random_state=0, n_init="auto").fit(X)
+        total_labels = kmeans.labels_
+        means = kmeans.cluster_centers_
+    else:
+        print('Using random most distant points')
+        centroides = Init_Centroide(X,k)
+        total_labels = get_cluster(X,centroides,-1)
+        means = return_new_centroide(total_labels,X,k)
+
+
+    labels = {lb for lb in total_labels}
     cov = []
     pi = []
 
@@ -79,10 +89,10 @@ def get_init_data(X,k=3):
     return pi,means,cov
 
 
-def gmm(X,epochs,k=3, DEBUG=True):
+def gmm(X,epochs,k=3, DEBUG=True,option=1):
 
 
-    pi,means,cov = get_init_data(X,k) 
+    pi,means,cov = get_init_data(X,k,option) 
     
     probs = get_probs(X,means,cov,pi)
 
@@ -129,7 +139,7 @@ if __name__ == '__main__':
 
     import kmeans
 
-    clases = gmm(X,200,k=3)
+    clases = gmm(X,200,k=3,option=1)
     # _,clases = kmeans.kmeans(X,3,0.5,2)
 
     # print(pi)
