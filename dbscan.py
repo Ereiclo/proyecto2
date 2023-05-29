@@ -11,9 +11,8 @@ def isNoise(label):
 
 
 
-def db_scan(X,r=0.5):
+def db_scan(X,r=0.5, min_vecinos = 3):
     tree = KDTree(X)
-    min_vecinos = 3 
     eps = .0000000001
 
     labels = np.full(shape=X.shape[0], fill_value=-1)

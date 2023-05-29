@@ -12,7 +12,6 @@ import gmm
 from tqdm import tqdm
 import json
 import os
-from sklearn.cluster import KMeans
 import matplotlib.pyplot as plt
 import pandas as pd
 from tqdm import tqdm
@@ -60,9 +59,60 @@ class Experimentos():
 
             pd.DataFrame(resultados).to_csv(f'resultados_experimentos/k_medias/{archivo}.csv',index=False)
 
+    def GMM():
+        k = range(2, 10+1)
+        epoca = [100, 500, 1000]
+        for archivo in dicc_pca:
+            resultados = {
+                "k": [],
+                'epoca': [],
+                'silhouette_score': [],
+                'davies_bouldin_score': [],
+                'calinski_harabasz_score': []
+            }
+            X = dicc_pca[archivo]
+            for k_i in tqdm(k):
+                for epoca_i in epoca:
+                    clases = gmm.gmm(X=X, epochs=epoca_i, k=k_i, DEBUG=False)
+                    resultados['k'].append(k_i)
+                    resultados['epoca'].append(epoca_i)
+                    resultados['silhouette_score'].append(silhouette_score(X,clases))
+                    resultados['davies_bouldin_score'].append(davies_bouldin_score(X,clases))
+                    resultados['calinski_harabasz_score'].append(calinski_harabasz_score(X,clases))
+
+            pd.DataFrame(resultados).to_csv(f'resultados_experimentos/gmm/{archivo}.csv',index=False)
+            
 
 
-Experimentos.K_Medias()
+
+    def DBSCAN():
+        radio = range(500, 1000+1, 100)
+        min_vecinos = range(3, 7) 
+        for archivo in dicc_pca:
+            # print(archivo)
+            resultados = {
+                'n_clases': [],
+                'radio': [],
+                'min_vecinos': [],
+                'silhouette_score': [],
+                'davies_bouldin_score': [],
+                'calinski_harabasz_score': []
+            }
+            X = dicc_pca[archivo]
+            for min_vecinos_i in min_vecinos:
+                for radio_i in tqdm(radio):
+                    clases = dbscan.db_scan(X, radio_i, min_vecinos_i)
+                    resultados['n_clases'].append(np.unique(clases).size)
+                    resultados['radio'].append(radio_i)
+                    resultados['min_vecinos'].append(min_vecinos_i)
+                    resultados['silhouette_score'].append(silhouette_score(X,clases))
+                    resultados['davies_bouldin_score'].append(davies_bouldin_score(X,clases))
+                    resultados['calinski_harabasz_score'].append(calinski_harabasz_score(X,clases))
+
+            pd.DataFrame(resultados).to_csv(f'resultados_experimentos/dbscan/{archivo}.csv',index=False)
+
+
+Experimentos.DBSCAN()
 
 """ 
 X = dicc_pca['caracteristicos2_pca0.99']

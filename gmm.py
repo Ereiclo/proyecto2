@@ -79,7 +79,7 @@ def get_init_data(X,k=3):
     return pi,means,cov
 
 
-def gmm(X,epochs,k=3):
+def gmm(X,epochs,k=3, DEBUG=True):
 
 
     pi,means,cov = get_init_data(X,k) 
@@ -87,7 +87,7 @@ def gmm(X,epochs,k=3):
     probs = get_probs(X,means,cov,pi)
 
     for i in range(epochs):
-        if i % 100 == 0:
+        if i % 100 == 0 and DEBUG:
             print(f'Estamos en la epoca {i}')
 
         means = get_new_means(X,probs)
