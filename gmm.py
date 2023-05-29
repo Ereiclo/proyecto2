@@ -127,7 +127,10 @@ if __name__ == '__main__':
 
     # print(kmeans.cluster_centers_)
 
+    import kmeans
+
     clases = gmm(X,200,k=3)
+    # _,clases = kmeans.kmeans(X,3,0.5,2)
 
     # print(pi)
     print(clases)

@@ -5,6 +5,9 @@ from matplotlib.pyplot import imshow
 import numpy as np
 
 
+np.random.seed(34)
+
+
 # Devuelve la distancia entre 2 vectores.
 # Pruebe con varias funciones de distancia.
 def distance(v1: np.ndarray, v2: np.ndarray, orden: int):
