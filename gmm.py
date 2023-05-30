@@ -7,16 +7,20 @@ import numpy as np
 from tqdm import tqdm
 from scipy.stats import multivariate_normal
 
+
+#la idea general en cada funcion es convertir todas las operaciones a un cubo
+#y ahi calcular con cada columna de probs
+
 def get_new_means(X,probs):
     
-
 
     _,k =  probs.shape
     N_i = get_N(probs)
 
-    X_ = np.tile(X,(k,1,1))
-    probs_ = probs.T.reshape(k,-1,1)
+    X_ = np.tile(X,(k,1,1)) #convertirlo a cubo
+    probs_ = probs.T.reshape(k,-1,1) #convertir cada columna a una dimension del cubo
 
+            #multiplicar el cubo por el cubo de columnas
     return np.sum(X_*probs_,axis=1)/N_i.reshape(-1,1)
 
 
@@ -24,6 +28,7 @@ def get_new_means(X,probs):
 def get_N(probs):
     return np.sum(probs,axis=0)
 
+#idea parecida que con new means
 def new_cov(X,probs,means):
     n,k = probs.shape 
     N_i = get_N(probs)
