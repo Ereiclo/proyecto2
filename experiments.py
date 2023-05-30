@@ -63,23 +63,26 @@ class Experimentos():
         k = range(2, 10+1)
         epoca = [100, 500, 1000]
         for archivo in dicc_pca:
-            print(archivo)
-            resultados = {
-                "k": [],
-                'epoca': [],
-                'silhouette_score': [],
-                'davies_bouldin_score': [],
-                'calinski_harabasz_score': []
-            }
-            X = dicc_pca[archivo]
-            for k_i in tqdm(k):
-                for epoca_i in epoca:
-                    clases = gmm.gmm(X=X, epochs=epoca_i, k=k_i, DEBUG=False)
-                    resultados['k'].append(k_i)
-                    resultados['epoca'].append(epoca_i)
-                    resultados['silhouette_score'].append(silhouette_score(X,clases))
-                    resultados['davies_bouldin_score'].append(davies_bouldin_score(X,clases))
-                    resultados['calinski_harabasz_score'].append(calinski_harabasz_score(X,clases))
+            try:
+                print(archivo)
+                resultados = {
+                    "k": [],
+                    'epoca': [],
+                    'silhouette_score': [],
+                    'davies_bouldin_score': [],
+                    'calinski_harabasz_score': []
+                }
+                X = dicc_pca[archivo]
+                for k_i in tqdm(k):
+                    for epoca_i in epoca:
+                        clases = gmm.gmm(X=X, epochs=epoca_i, k=k_i, DEBUG=False)
+                        resultados['k'].append(k_i)
+                        resultados['epoca'].append(epoca_i)
+                        resultados['silhouette_score'].append(silhouette_score(X,clases))
+                        resultados['davies_bouldin_score'].append(davies_bouldin_score(X,clases))
+                        resultados['calinski_harabasz_score'].append(calinski_harabasz_score(X,clases))
+            except:
+                continue
 
             pd.DataFrame(resultados).to_csv(f'resultados_experimentos/gmm/{archivo}.csv',index=False)
             
